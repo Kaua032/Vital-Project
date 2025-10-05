@@ -14,30 +14,37 @@ import java.util.List;
  * @author User
  */
 public class App extends JFrame {
-    private JTextField campoTarefa;
+    private JTextField campoTitulo;
+    private JTextField campoDescricao;
     private JButton botaoAdicionar;
     private JTextArea listaTarefas;
-    private ArrayList<String> tarefas = new ArrayList<>();
+    private ArrayList<TarefaModel.Tarefa> tarefas = new ArrayList<>();
 
     public App(){
-        campoTarefa = new JTextField(20);
+        campoTitulo = new JTextField(20);
+        campoDescricao = new JTextField(20);
         botaoAdicionar = new JButton("Adicionar");
         listaTarefas = new JTextArea(10, 30);
         listaTarefas.setEditable(false);
 
         JPanel painelEntrada = new JPanel();
-        painelEntrada.add(new JLabel("Tarefa:"));
-        painelEntrada.add(campoTarefa);
+        painelEntrada.add(new JLabel("Título:"));
+        painelEntrada.add(campoTitulo);
+        painelEntrada.add(new JLabel("Descrição:"));
+        painelEntrada.add(campoDescricao);
         painelEntrada.add(botaoAdicionar);
 
         botaoAdicionar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String tarefa = campoTarefa.getText();
-                if(!tarefa.isEmpty()) {
+                String titulo = campoTitulo.getText();
+                String descricao = campoDescricao.getText();
+                if(!titulo.isEmpty() && !descricao.isEmpty()) {
+                    TarefaModel.TarefaComum tarefa = new TarefaModel.TarefaComum(1, titulo, descricao);
                     tarefas.add(tarefa);
                     atualizarLista();
-                    campoTarefa.setText("");
+                    campoTitulo.setText("");
+                    campoDescricao.setText("");
                 }
             }
         });
@@ -54,8 +61,8 @@ public class App extends JFrame {
 
     private void atualizarLista() {
         listaTarefas.setText("");
-        for (String t : tarefas) {
-            listaTarefas.append(t + "\n");
+        for(TarefaModel.Tarefa t: tarefas){
+            listaTarefas.append(t.getTitulo() + " - " + t.getDescricao() + "\n");
         }
     }
 
