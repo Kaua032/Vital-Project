@@ -22,11 +22,17 @@ import java.util.Objects;
 public class App extends JFrame {
     private JTextField campoTitulo;
     private JTextField campoDescricao;
+
     private JComboBox<String> selectTipo;
-    private JSpinner campoData;
     String[] tipos = {"Tarefa Comum", "Tarefa Prazo", "Tarefa Rotina"};
-    private JTextField campoFrequencia;
+
+    private JSpinner campoData;
+
+    private JComboBox<String> selectFrequencia;
+    String[] tiposFreq = {"Diária", "Mensal", "Anual", "Horária"};
+
     private JButton botaoAdicionar;
+
     private JTextArea listaTarefas;
     private ArrayList<TarefaModel.Tarefa> tarefas = new ArrayList<>();
 
@@ -35,7 +41,7 @@ public class App extends JFrame {
         campoDescricao = new JTextField(20);
         selectTipo = new JComboBox<>(tipos);
 
-        campoFrequencia = new JTextField(20);
+        selectFrequencia = new JComboBox<>(tiposFreq);
 
         campoData = new JSpinner(new SpinnerDateModel());
         JSpinner.DateEditor editor = new JSpinner.DateEditor(campoData, "dd/MM/yyyy");
@@ -47,8 +53,10 @@ public class App extends JFrame {
         listaTarefas.setEditable(false);
 
         JPanel painelSuperior = new JPanel();
+
         JPanel painelEntrada = new JPanel();
         JPanel painelEntrada2 = new JPanel();
+        
         painelEntrada.add(new JLabel("Título:"));
         painelEntrada.add(campoTitulo);
         painelEntrada.add(new JLabel("Descrição:"));
@@ -59,7 +67,7 @@ public class App extends JFrame {
 
         JLabel freqLabel = new JLabel("Frequência:");
         painelEntrada2.add(freqLabel);
-        painelEntrada2.add(campoFrequencia);
+        painelEntrada2.add(selectFrequencia);
 
         JLabel dataLabel = new JLabel("Data:");
         painelEntrada2.add(dataLabel);
@@ -69,20 +77,20 @@ public class App extends JFrame {
 
         campoData.setVisible(false);
         dataLabel.setVisible(false);
-        campoFrequencia.setVisible(false);
+        selectFrequencia.setVisible(false);
         freqLabel.setVisible(false);
 
         selectTipo.addActionListener(e -> {
             campoData.setVisible(false);
             dataLabel.setVisible(false);
-            campoFrequencia.setVisible(false);
+            selectFrequencia.setVisible(false);
             freqLabel.setVisible(false);
             String Tipo = (String) selectTipo.getSelectedItem();
             if(Tipo.equals("Tarefa Prazo")){
                 campoData.setVisible(true);
                 dataLabel.setVisible(true);
             }else if(Tipo.equals("Tarefa Rotina")){
-                campoFrequencia.setVisible(true);
+                selectFrequencia.setVisible(true);
                 freqLabel.setVisible(true);
             }
         });
@@ -98,7 +106,7 @@ public class App extends JFrame {
                         TarefaModel.TarefaComum tarefa = new TarefaModel.TarefaComum(1, titulo, descricao);
                         tarefas.add(tarefa);
                     }else if(Tipo.equals("Tarefa Rotina")){
-                        String frequencia = campoFrequencia.getText();
+                        String frequencia =  (String) selectFrequencia.getSelectedItem();
                         TarefaModel.TarefaRotina tarefa = new TarefaModel.TarefaRotina(1, titulo, descricao, frequencia);
                         tarefas.add(tarefa);
                     }else if(Tipo.equals("Tarefa Prazo")){
