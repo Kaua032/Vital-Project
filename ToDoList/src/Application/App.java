@@ -138,12 +138,21 @@ public class App extends JFrame {
                         tarefas.add(tarefa);
                     }
 
+                    for(TarefaModel.Tarefa t: tarefas){
+                        t.exibirDetalhes();
+                    }
+
                     //Chama a para atualizar a lista que é mostrada na tela
                     //não está atualizando a lista com as tarefas e sim a lista do campo que é mostrado
                     atualizarLista();
                     //limpando os campos:
                     campoTitulo.setText("");
                     campoDescricao.setText("");
+                }else{
+                    JOptionPane.showMessageDialog(null,
+                            "Preencha todos os campos para criar uma terefa",
+                                "Mensagem de Erro",
+                                    JOptionPane.PLAIN_MESSAGE);
                 }
             }
         });
