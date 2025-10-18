@@ -269,7 +269,15 @@ public class App extends JFrame {
     private void atualizarLista() {
         listaTarefas.setText("");
         for (TarefaModel.Tarefa t : tarefas) {
-            listaTarefas.append(t.getTitulo() + " - " + t.getDescricao() + "\n");
+            String tipoTarefa = "";
+            if (t instanceof TarefaModel.TarefaComum) {
+                tipoTarefa = "Tarefa Comum - ";
+            } else if (t instanceof TarefaModel.TarefaRotina) {
+                tipoTarefa = "Rotina - ";
+            } else if (t instanceof TarefaModel.TarefaComPrazo) {
+                tipoTarefa = "Tarefa Com Prazo - ";
+            }
+            listaTarefas.append(tipoTarefa + t.getTitulo() + " - " + t.getDescricao() + "\n");
         }
     }
 
