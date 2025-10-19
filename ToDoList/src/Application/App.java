@@ -41,12 +41,14 @@ public class App extends JFrame {
     private JButton botaoAdicionar;
 
     // Onde será guardada as tarefas criadas:
-    private JTextArea listaTarefas;
+    private JPanel painelTarefasComum;
     private ArrayList<TarefaModel.TarefaComum> tarefas = new ArrayList<>();
-    private JTextArea listaTArefasRotina;
+    private JPanel painelTarefasRotina;
     private ArrayList<TarefaModel.TarefaRotina> tarefasRotina = new ArrayList<>();
-    private JTextArea listaTarefasPrazo;
+    private JPanel painelTarefasPrazo;
     private ArrayList<TarefaModel.TarefaComPrazo> tarefasPrazo = new ArrayList<>();
+
+    private int proximoId = 0;
 
     public App() {
         // Título, tamanho, centraliza
@@ -89,23 +91,11 @@ public class App extends JFrame {
         botaoAdicionar = new JButton("Adicionar");
 
         // Atribuindo valor ao listaTarefas onde será mostrado as tarefas criadas:
-        listaTarefas = new JTextArea(15, 40);
-        listaTarefas.setEditable(false);
-        listaTarefas.setBackground(cinza);
-        listaTarefas.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        listaTarefas.setFont(fontePadrao);
 
-        listaTArefasRotina = new JTextArea(15, 40);
-        listaTArefasRotina.setEditable(false);
-        listaTArefasRotina.setBackground(cinza);
-        listaTArefasRotina.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        listaTArefasRotina.setFont(fontePadrao);
 
-        listaTarefasPrazo = new JTextArea(15, 40);
-        listaTarefasPrazo.setEditable(false);
-        listaTarefasPrazo.setBackground(cinza);
-        listaTarefasPrazo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        listaTarefasPrazo.setFont(fontePadrao);
+        painelTarefasComum = criarPainelLista();
+        painelTarefasPrazo = criarPainelLista();
+        painelTarefasRotina = criarPainelLista();
 
         // Aplicar estilo aos campos
         campoTitulo.setFont(fontePadrao);
@@ -220,20 +210,20 @@ public class App extends JFrame {
             selectFrequencia.setVisible(false);
             freqLabel.setVisible(false);
 
-            painelLista.removeAll(); // Remove qualquer lista anterior
+            painelLista.removeAll();
 
             String tipo = (String) selectTipo.getSelectedItem();
 
             if (tipo.equals("Tarefa Prazo")) {
                 campoData.setVisible(true);
                 dataLabel.setVisible(true);
-                painelLista.add(new JScrollPane(listaTarefasPrazo), BorderLayout.CENTER);
+                painelLista.add(new JScrollPane(painelTarefasPrazo), BorderLayout.CENTER);
             } else if (tipo.equals("Tarefa Rotina")) {
                 selectFrequencia.setVisible(true);
                 freqLabel.setVisible(true);
-                painelLista.add(new JScrollPane(listaTArefasRotina), BorderLayout.CENTER);
+                painelLista.add(new JScrollPane(painelTarefasRotina), BorderLayout.CENTER);
             } else {
-                painelLista.add(new JScrollPane(listaTarefas), BorderLayout.CENTER);
+                painelLista.add(new JScrollPane(painelTarefasComum), BorderLayout.CENTER);
             }
 
             painelLista.revalidate();
@@ -268,16 +258,16 @@ public class App extends JFrame {
                 String tipo = (String) selectTipo.getSelectedItem();
                 if (!titulo.isEmpty() && !descricao.isEmpty()) {
                     if (tipo.equals("Tarefa Comum")) {
-                        TarefaModel.TarefaComum tarefa = new TarefaModel.TarefaComum(1, titulo, descricao);
+                        TarefaModel.TarefaComum tarefa = new TarefaModel.TarefaComum(proximoId++, titulo, descricao);
                         tarefas.add(tarefa);
                     } else if (tipo.equals("Tarefa Rotina")) {
                         String frequencia = (String) selectFrequencia.getSelectedItem();
-                        TarefaModel.TarefaRotina tarefa = new TarefaModel.TarefaRotina(1, titulo, descricao, frequencia);
+                        TarefaModel.TarefaRotina tarefa = new TarefaModel.TarefaRotina(proximoId++, titulo, descricao, frequencia);
                         tarefasRotina.add(tarefa);
                     } else if (tipo.equals("Tarefa Prazo")) {
                         Date data = (Date) campoData.getValue();
                         LocalDate dataTarefa = data.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                        TarefaModel.TarefaComPrazo tarefa = new TarefaModel.TarefaComPrazo(1, titulo, descricao, dataTarefa);
+                        TarefaModel.TarefaComPrazo tarefa = new TarefaModel.TarefaComPrazo(proximoId++, titulo, descricao, dataTarefa);
                         tarefasPrazo.add(tarefa);
                     }
 
@@ -304,24 +294,75 @@ public class App extends JFrame {
         setVisible(true);
     }
 
+    private JPanel criarPainelLista(){
+        JPanel painel = new JPanel();
+        painel.setLayout(new BoxLayout(painel, BoxLayout.Y_AXIS));
+        painel.setBackground(Color.WHITE);
+        return painel;
+    }
+
+    private JPanel criarLinhaTarefa(String texto, Runnable aoDeletar) {
+        JPanel linha = new JPanel(new BorderLayout());
+        linha.setBackground(Color.WHITE);
+        linha.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
+
+        JLabel label = new JLabel(texto);
+        JButton botaoDel = new JButton("🗑️");
+        botaoDel.setBackground(new Color(255, 182, 193));
+        botaoDel.setFocusPainted(false);
+        botaoDel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+
+        botaoDel.setPreferredSize(new Dimension(50, 15));
+
+        botaoDel.addActionListener(e -> aoDeletar.run());
+
+        linha.add(label, BorderLayout.CENTER);
+        linha.add(botaoDel, BorderLayout.EAST);
+
+        return linha;
+    }
+
+
     // Função para atualizar a lista mostrada na tela:
     private void atualizarLista() {
-        listaTarefas.setText("");
-        listaTArefasRotina.setText("");
-        listaTarefasPrazo.setText("");
+        painelTarefasComum.removeAll();
+        painelTarefasPrazo.removeAll();
+        painelTarefasRotina.removeAll();
 
         for (TarefaModel.TarefaComum t : tarefas) {
-            listaTarefas.append("Tarefa Comum - " + t.getTitulo() + " - " + t.getDescricao() + "\n");
+            painelTarefasComum.add(criarLinhaTarefa(t.getTitulo() + " - " + t.getDescricao(),
+                    () -> {
+                        tarefas.remove(t);
+                        atualizarLista();
+                    }));
         }
 
         for (TarefaModel.TarefaRotina t : tarefasRotina) {
-            listaTArefasRotina.append("Rotina - " + t.getTitulo() + " - " + t.getDescricao() + " (" + t.getFrequencia() + ")\n");
+            painelTarefasRotina.add(criarLinhaTarefa(
+                    t.getTitulo() + " - " + t.getDescricao() + " (" + t.getFrequencia() + ")",
+                    () -> {
+                        tarefasRotina.remove(t);
+                        atualizarLista();
+                    }));
         }
 
         for (TarefaModel.TarefaComPrazo t : tarefasPrazo) {
-            listaTarefasPrazo.append("Tarefa Prazo - " + t.getTitulo() + " - " + t.getDescricao() + " até " + t.getDataLimite() + "\n");
+            painelTarefasPrazo.add(criarLinhaTarefa(
+                    t.getTitulo() + " - " + t.getDescricao() + " até " + t.getDataLimite(),
+                    () -> {
+                        tarefasPrazo.remove(t);
+                        atualizarLista();
+                    }));
         }
+
+        painelTarefasComum.revalidate();
+        painelTarefasComum.repaint();
+        painelTarefasPrazo.revalidate();
+        painelTarefasPrazo.repaint();
+        painelTarefasRotina.revalidate();
+        painelTarefasRotina.repaint();
     }
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new App());
