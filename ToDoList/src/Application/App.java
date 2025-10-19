@@ -95,6 +95,18 @@ public class App extends JFrame {
         listaTarefas.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         listaTarefas.setFont(fontePadrao);
 
+        listaTArefasRotina = new JTextArea(15, 40);
+        listaTArefasRotina.setEditable(false);
+        listaTArefasRotina.setBackground(cinza);
+        listaTArefasRotina.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        listaTArefasRotina.setFont(fontePadrao);
+
+        listaTarefasPrazo = new JTextArea(15, 40);
+        listaTarefasPrazo.setEditable(false);
+        listaTarefasPrazo.setBackground(cinza);
+        listaTarefasPrazo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        listaTarefasPrazo.setFont(fontePadrao);
+
         // Aplicar estilo aos campos
         campoTitulo.setFont(fontePadrao);
         campoDescricao.setFont(fontePadrao);
@@ -184,6 +196,17 @@ public class App extends JFrame {
         painelBotaoInferior.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
         painelBotaoInferior.add(botaoAdicionar);
 
+        // Área de exibição de tarefas
+        JPanel painelLista = new JPanel(new BorderLayout());
+        painelLista.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(10, 20, 20, 20),
+                BorderFactory.createTitledBorder(
+                        BorderFactory.createLineBorder(rosaMedio),
+                        "Lista de Tarefas",
+                        0, 0, fontePadrao.deriveFont(Font.BOLD))
+        ));
+        painelLista.setBackground(rosaClaro);
+
         // Alterando a visibilidade dos campos que só aparecem após escolher o tipo de tarefa:
         campoData.setVisible(false);
         dataLabel.setVisible(false);
@@ -197,14 +220,24 @@ public class App extends JFrame {
             selectFrequencia.setVisible(false);
             freqLabel.setVisible(false);
 
+            painelLista.removeAll(); // Remove qualquer lista anterior
+
             String tipo = (String) selectTipo.getSelectedItem();
+
             if (tipo.equals("Tarefa Prazo")) {
                 campoData.setVisible(true);
                 dataLabel.setVisible(true);
+                painelLista.add(new JScrollPane(listaTarefasPrazo), BorderLayout.CENTER);
             } else if (tipo.equals("Tarefa Rotina")) {
                 selectFrequencia.setVisible(true);
                 freqLabel.setVisible(true);
+                painelLista.add(new JScrollPane(listaTArefasRotina), BorderLayout.CENTER);
+            } else {
+                painelLista.add(new JScrollPane(listaTarefas), BorderLayout.CENTER);
             }
+
+            painelLista.revalidate();
+            painelLista.repaint();
         });
 
         // Adiciona os sub-painéis ao painel superior
@@ -212,29 +245,7 @@ public class App extends JFrame {
         painelSuperior.add(Box.createVerticalStrut(10));
         painelSuperior.add(painelEntrada2);
 
-        // Área de exibição de tarefas
-        JPanel painelLista = new JPanel(new BorderLayout());
-        painelLista.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(10, 20, 20, 20),
-                BorderFactory.createTitledBorder(
-                        BorderFactory.createLineBorder(rosaMedio),
-                        "Lista de Tarefas",
-                        0, 0, fontePadrao.deriveFont(Font.BOLD))
-        ));
-        painelLista.setBackground(rosaClaro);
 
-        //Analisando qual tipo está selecionado para mostrar a lista:
-        selectTipoLista.addActionListener(ActionEvent -> {
-            String tipo = (String) selectTipoLista.getSelectedItem();
-            if (tipo.equals("Tarefa Comum")){
-                painelLista.add(new JScrollPane(listaTarefas), BorderLayout.CENTER);
-            }else if (tipo.equals("Tarefa Prazo")){
-                painelLista.add(new JScrollPane(listaTarefasPrazo), BorderLayout.CENTER);
-            }else if (tipo.equals("Tarefa Rotina")){
-                painelLista.add(new JScrollPane(listaTArefasRotina), BorderLayout.CENTER);
-            }
-        });
-        painelLista.add(new JScrollPane(listaTarefas), BorderLayout.CENTER);
 
         //Painel com os botões de escolher a lista que vai ser mostrada:
         JPanel painelBotoesLista = new JPanel(new BorderLayout());
@@ -293,18 +304,19 @@ public class App extends JFrame {
     // Função para atualizar a lista mostrada na tela:
     private void atualizarLista() {
         listaTarefas.setText("");
-        for (TarefaModel.Tarefa t : tarefas) {
-            String tipoTarefa = "";
-            if (t instanceof TarefaModel.TarefaComum) {
-                tipoTarefa = "Tarefa Comum - ";
-                listaTarefas.append(tipoTarefa + t.getTitulo() + " - " + t.getDescricao() + "\n");
-            } else if (t instanceof TarefaModel.TarefaRotina) {
-                tipoTarefa = "Rotina - ";
-                listaTArefasRotina.append(tipoTarefa + t.getTitulo() + " - " + t.getDescricao() + ((TarefaModel.TarefaRotina) t).getFrequencia() + "\n");
-            } else if (t instanceof TarefaModel.TarefaComPrazo) {
-                tipoTarefa = "Tarefa Com Prazo - ";
-                listaTarefasPrazo.append(tipoTarefa + t.getTitulo() + " - " + t.getDescricao() + ((TarefaModel.TarefaComPrazo) t).getDataLimite() + "\n");
-            }
+        listaTArefasRotina.setText("");
+        listaTarefasPrazo.setText("");
+
+        for (TarefaModel.TarefaComum t : tarefas) {
+            listaTarefas.append("Tarefa Comum - " + t.getTitulo() + " - " + t.getDescricao() + "\n");
+        }
+
+        for (TarefaModel.TarefaRotina t : tarefasRotina) {
+            listaTArefasRotina.append("Rotina - " + t.getTitulo() + " - " + t.getDescricao() + " (" + t.getFrequencia() + ")\n");
+        }
+
+        for (TarefaModel.TarefaComPrazo t : tarefasPrazo) {
+            listaTarefasPrazo.append("Tarefa Prazo - " + t.getTitulo() + " - " + t.getDescricao() + " até " + t.getDataLimite() + "\n");
         }
     }
 
