@@ -26,7 +26,7 @@ public class TarefaModel {
         public void setDescricao(String descricao) { this.descricao = descricao; }
         public void setConcluida(boolean concluida) { this.concluida = concluida; }
 
-        public void deleteById()
+        //public void deleteById()
 
         public void concluir() {
             this.concluida = true;
