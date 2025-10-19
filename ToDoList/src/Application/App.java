@@ -312,7 +312,7 @@ public class App extends JFrame {
         botaoDel.setFocusPainted(false);
         botaoDel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
-        botaoDel.setPreferredSize(new Dimension(50, 15));
+        botaoDel.setPreferredSize(new Dimension(50, 35));
 
         botaoDel.addActionListener(e -> aoDeletar.run());
 
