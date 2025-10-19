@@ -240,6 +240,9 @@ public class App extends JFrame {
             painelLista.repaint();
         });
 
+        selectTipo.setSelectedItem("Tarefa Comum");
+        selectTipo.getActionListeners()[0].actionPerformed(null);
+
         // Adiciona os sub-painéis ao painel superior
         painelSuperior.add(painelEntrada);
         painelSuperior.add(Box.createVerticalStrut(10));
