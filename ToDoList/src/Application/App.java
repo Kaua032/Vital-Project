@@ -23,6 +23,9 @@ public class App extends JFrame {
     private JTextField campoTitulo;
     private JTextField campoDescricao;
 
+    //Para selecionar o tipo de tarefa mostrado:
+    private JComboBox<String> selectTipoLista;
+
     // Para selecionar o tipo de tarefa:
     private JComboBox<String> selectTipo;
     String[] tipos = {"Tarefa Comum", "Tarefa Prazo", "Tarefa Rotina"};
@@ -39,7 +42,11 @@ public class App extends JFrame {
 
     // Onde será guardada as tarefas criadas:
     private JTextArea listaTarefas;
-    private ArrayList<TarefaModel.Tarefa> tarefas = new ArrayList<>();
+    private ArrayList<TarefaModel.TarefaComum> tarefas = new ArrayList<>();
+    private JTextArea listaTArefasRotina;
+    private ArrayList<TarefaModel.TarefaRotina> tarefasRotina = new ArrayList<>();
+    private JTextArea listaTarefasPrazo;
+    private ArrayList<TarefaModel.TarefaComPrazo> tarefasPrazo = new ArrayList<>();
 
     public App() {
         // Título, tamanho, centraliza
@@ -66,6 +73,8 @@ public class App extends JFrame {
         // Atribuindo valor aos campos título e descrição:
         campoTitulo = new JTextField(20);
         campoDescricao = new JTextField(20);
+        //Atribuindo valor e seus valora que pode ser escolhidos no campo para mostrar a lista:
+        selectTipoLista = new JComboBox<>(tipos);
         // Atribuindo valor e seus valores que podem ser escolhidos no campo:
         selectTipo = new JComboBox<>(tipos);
         // Atribuindo valor e seus valores que podem ser escolhidos no campo:
@@ -213,7 +222,23 @@ public class App extends JFrame {
                         0, 0, fontePadrao.deriveFont(Font.BOLD))
         ));
         painelLista.setBackground(rosaClaro);
+
+        //Analisando qual tipo está selecionado para mostrar a lista:
+        selectTipoLista.addActionListener(ActionEvent -> {
+            String tipo = (String) selectTipoLista.getSelectedItem();
+            if (tipo.equals("Tarefa Comum")){
+                painelLista.add(new JScrollPane(listaTarefas), BorderLayout.CENTER);
+            }else if (tipo.equals("Tarefa Prazo")){
+                painelLista.add(new JScrollPane(listaTarefasPrazo), BorderLayout.CENTER);
+            }else if (tipo.equals("Tarefa Rotina")){
+                painelLista.add(new JScrollPane(listaTArefasRotina), BorderLayout.CENTER);
+            }
+        });
         painelLista.add(new JScrollPane(listaTarefas), BorderLayout.CENTER);
+
+        //Painel com os botões de escolher a lista que vai ser mostrada:
+        JPanel painelBotoesLista = new JPanel(new BorderLayout());
+        painelBotoesLista.setBorder(BorderFactory.createEmptyBorder(10,20,20,20));
 
         // Adiciona os painéis ao JFrame
         add(painelSuperior, BorderLayout.NORTH);
@@ -234,12 +259,12 @@ public class App extends JFrame {
                     } else if (tipo.equals("Tarefa Rotina")) {
                         String frequencia = (String) selectFrequencia.getSelectedItem();
                         TarefaModel.TarefaRotina tarefa = new TarefaModel.TarefaRotina(1, titulo, descricao, frequencia);
-                        tarefas.add(tarefa);
+                        tarefasRotina.add(tarefa);
                     } else if (tipo.equals("Tarefa Prazo")) {
                         Date data = (Date) campoData.getValue();
                         LocalDate dataTarefa = data.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                         TarefaModel.TarefaComPrazo tarefa = new TarefaModel.TarefaComPrazo(1, titulo, descricao, dataTarefa);
-                        tarefas.add(tarefa);
+                        tarefasPrazo.add(tarefa);
                     }
 
                     for (TarefaModel.Tarefa t : tarefas) {
@@ -272,12 +297,14 @@ public class App extends JFrame {
             String tipoTarefa = "";
             if (t instanceof TarefaModel.TarefaComum) {
                 tipoTarefa = "Tarefa Comum - ";
+                listaTarefas.append(tipoTarefa + t.getTitulo() + " - " + t.getDescricao() + "\n");
             } else if (t instanceof TarefaModel.TarefaRotina) {
                 tipoTarefa = "Rotina - ";
+                listaTArefasRotina.append(tipoTarefa + t.getTitulo() + " - " + t.getDescricao() + ((TarefaModel.TarefaRotina) t).getFrequencia() + "\n");
             } else if (t instanceof TarefaModel.TarefaComPrazo) {
                 tipoTarefa = "Tarefa Com Prazo - ";
+                listaTarefasPrazo.append(tipoTarefa + t.getTitulo() + " - " + t.getDescricao() + ((TarefaModel.TarefaComPrazo) t).getDataLimite() + "\n");
             }
-            listaTarefas.append(tipoTarefa + t.getTitulo() + " - " + t.getDescricao() + "\n");
         }
     }
 

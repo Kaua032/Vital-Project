@@ -55,12 +55,18 @@ public class TarefaModel {
             this.frequencia = frequencia;
         }
 
+        public String getFrequencia(){
+            return this.frequencia;
+        }
+
         @Override
         public void exibirDetalhes() {
             System.out.println("Tarefa Rotina: " + titulo + " | " + descricao +
                     " | Frequência: " + frequencia + " | " +
                     (concluida ? "Concluída" : "Pendente"));
         }
+
+
     }
 
     // Subclasse Tarefa com Prazo
@@ -70,6 +76,10 @@ public class TarefaModel {
         public TarefaComPrazo(int id, String titulo, String descricao, LocalDate dataLimite) {
             super(id, titulo, descricao);
             this.dataLimite = dataLimite;
+        }
+
+        public LocalDate getDataLimite(){
+            return this.dataLimite;
         }
 
         @Override
